@@ -52,8 +52,8 @@ class open_main_gui(QDialog):
         self.screen_height = screen_height
 
         self.tmp = custom_frame_dialog(screen_height=self.screen_height)
-        self.tmp.setMinimumHeight(50)
-        self.tmp.setMinimumWidth(50)
+        self.tmp.setMinimumHeight(250)
+        self.tmp.setMinimumWidth(350)
         self.tmp.move(100,100)
         self.tmp.setWindowTitle('This is a test GUI')
         self.tmp.set_titlebar_color('rgba(117,159,120,1)')
@@ -64,8 +64,22 @@ class open_main_gui(QDialog):
         self.tmp.set_win_title_botton_side('right')
         self.tmp.show()
 
-        # This folder is the root of all file storage
-        self.ground_base_folder = r'F:\desktop\FileAnnotator\alla_filer'
+        self.test_btn_1 = QPushButton('test button 1',self.tmp)
+        self.test_btn_1.setObjectName('custom_btn1')
+        self.test_btn_1.setFixedSize(300,100)
+        self.test_btn_1.move(100,200)
+        self.test_btn_2 = QPushButton('test button 2',self.tmp)
+        self.test_btn_2.setObjectName('custom_btn1')
+        self.test_btn_2.setFixedSize(300, 100)
+
+        self.test_btn_1.show()
+        self.test_btn_2.show()
+        self.tmp.resizeEvent(0)
+        #dummy_layput = QVBoxLayout()
+        #dummy_layput.addWidget(self.test_btn_1)
+        #dummy_layput.addWidget(self.test_btn_2)
+        #self.tmp.setLayout(dummy_layput)
+
 
         self.setStyleSheet(dictToCSS(CSS))
 
@@ -136,6 +150,22 @@ class open_main_gui(QDialog):
         self.set_win_title_bat_button_side_btn.setStyleSheet(css_)
         self.set_win_title_bat_button_side_btn.clicked.connect(self.shift_titlebar_button_side)
 
+        self.set_btn_backgrnd_btn = QPushButton('Button background')
+        self.set_btn_backgrnd_btn.setMinimumHeight(min_btb_h)
+        self.set_btn_backgrnd_btn.setMinimumWidth(min_btn_w)
+        self.set_btn_backgrnd_btn.setDisabled(False)
+        self.set_btn_backgrnd_btn.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.set_btn_backgrnd_btn.setStyleSheet(css_)
+        self.set_btn_backgrnd_btn.clicked.connect(self.select_button_background)
+
+        self.set_btn_radius_btn = QPushButton('Button border radius')
+        self.set_btn_radius_btn.setMinimumHeight(min_btb_h)
+        self.set_btn_radius_btn.setMinimumWidth(min_btn_w)
+        self.set_btn_radius_btn.setDisabled(False)
+        self.set_btn_radius_btn.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.set_btn_radius_btn.setStyleSheet(css_)
+        self.set_btn_radius_btn.clicked.connect(self.set_btn_radius)
+
         self.titlebar_lbl = QLineEdit('')
         self.titlebar_lbl.returnPressed.connect(self.select_titlebar_color_enter)
         self.frame_col_lbl = QLineEdit('')
@@ -146,6 +176,10 @@ class open_main_gui(QDialog):
         self.framewidth_lbl.returnPressed.connect(self.main_background_lbl_enter)
         self.resize_senitivity_lbl = QLineEdit('')
         self.resize_senitivity_lbl.returnPressed.connect(self.set_resize_sensitivity_enter)
+        self.set_btn_backgrnd_lbl = QLineEdit('')
+        self.set_btn_backgrnd_lbl.returnPressed.connect(self.select_button_background_enter)
+        self.set_btn_radius_lbl = QLineEdit('')
+        self.set_btn_radius_lbl.returnPressed.connect(self.set_btn_radius_enter)
 
 
         all_layouts = QVBoxLayout()
@@ -166,7 +200,12 @@ class open_main_gui(QDialog):
         layout5.addWidget(self.resize_senitivity_lbl)
         layout6 = QHBoxLayout()
         layout6.addWidget(self.set_win_title_bat_button_side_btn)
-
+        layout7 = QHBoxLayout()
+        layout7.addWidget(self.set_btn_backgrnd_btn)
+        layout7.addWidget(self.set_btn_backgrnd_lbl)
+        layout8 = QHBoxLayout()
+        layout8.addWidget(self.set_btn_radius_btn)
+        layout8.addWidget(self.set_btn_radius_lbl)
 
         all_buttons_layout = QVBoxLayout()
         all_buttons_layout.addLayout(layout1)
@@ -175,6 +214,8 @@ class open_main_gui(QDialog):
         all_buttons_layout.addLayout(layout4)
         all_buttons_layout.addLayout(layout5)
         all_buttons_layout.addLayout(layout6)
+        all_buttons_layout.addLayout(layout7)
+        all_buttons_layout.addLayout(layout8)
 
         # Add everything to the main layout:
         main_layout = QVBoxLayout()
@@ -246,7 +287,7 @@ class open_main_gui(QDialog):
             print('dfgh')
 
     def set_resize_sensitivity(self):
-        nr_pixels, ok = QInputDialog.getText(self, 'set frame width', 'Type nr pixels width:')
+        nr_pixels, ok = QInputDialog.getText(self, 'set resize sensitivity', 'Type nr pixels:')
         if ok:
             try:
                 nr_pixels = int(nr_pixels)
@@ -270,6 +311,37 @@ class open_main_gui(QDialog):
         else:
             self.set_win_title_bat_button_side_btn.setText('Titlebar buttons (right)')
             self.tmp.set_win_title_botton_side('right')
+
+    def select_button_background(self):
+        color = QColorDialog.getColor().getRgb()
+        self.tmp.set_btn_background_color('rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)')
+        self.set_btn_backgrnd_lbl.setText("'" + 'rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)' + "'")
+
+    def select_button_background_enter(self):
+        txt = self.set_btn_backgrnd_lbl.text()
+        if txt[0]=="'":
+            self.tmp.set_btn_background_color(txt[1:len(txt)-1])
+        else:
+            self.tmp.set_btn_background_color(txt)
+
+    def set_btn_radius(self):
+        nr_pixels, ok = QInputDialog.getText(self, 'set button radius', 'Type nr pixels:')
+        if ok:
+            try:
+                nr_pixels = int(nr_pixels)
+                self.tmp.set_button_border_radius(str(nr_pixels))
+                self.set_btn_radius_lbl.setText(str(nr_pixels))
+            except:
+                print('dfgh')
+    def set_btn_radius_enter(self):
+        nr_pixels = self.set_btn_radius_lbl.text()
+        try:
+            nr_pixels = int(nr_pixels)
+            self.tmp.set_button_border_radius(str(nr_pixels))
+        except:
+            print('dfgh')
+
+
 if __name__ == '__main__':
     app = QApplication([])
     screen_resolution = app.desktop().screenGeometry()

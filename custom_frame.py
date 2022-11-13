@@ -97,6 +97,24 @@ CSS = \
                 'color': 'rgba(255, 255, 255, 1)',
                 'background-color': MIN_WIN_BTN_HOVER_COLOR,
             },
+        'QPushButton#custom_btn1':
+            {
+                'font-size':'20px',
+                'border': '2px solid',
+                'border-color': TITLEBAR_COLOR,
+                'border-radius':'20',
+                'padding': '5px',
+            },
+        'QPushButton#custom_btn1:!hover':
+            {
+                'color': 'rgba(255, 255, 255, 1)',
+                'background-color': WIN_MAIN_COLOR,
+            },
+        'QPushButton#custom_btn1:hover':
+            {
+                'color': 'rgba(255, 255, 255, 1)',
+                'background-color': WIN_MAIN_COLOR,
+            },
     }
 
 def dictToCSS(dictionnary):
@@ -184,8 +202,30 @@ class custom_frame_dialog(QDialog):
         self.frame_resize_label_bottom_right.setFixedSize(self.frame_wid, self.frame_wid)
         self.frame_resize_label_bottom_right.move(self.frameGeometry().width()-self.frame_wid, self.frameGeometry().height() - self.frame_wid)
 
+
+        try:
+            child_btns_added = [w for w in self.children() if w.objectName() == 'custom_btn1']
+
+            for i,but in enumerate(child_btns_added):
+                but.setGeometry(self.frameGeometry().width() * 0.5 - but.geometry().width() * 0.5, self.frameGeometry().height()*0.5-60*len(child_btns_added)+i*120, but.geometry().width(), but.geometry().height())
+            self.setMinimumHeight(len(child_btns_added)*120+80)
+        except:
+            pass
+
+
+    def set_button_border_radius(self,r):
+        self.css_sheet['QPushButton#custom_btn1']['border-radius'] = r
+        self.setStyleSheet(dictToCSS(self.css_sheet))
+
+    def set_btn_background_color(self,color_in):
+        self.css_sheet['QPushButton#custom_btn1:!hover']['background'] = color_in
+        self.css_sheet['QPushButton#custom_btn1:hover']['background'] = color_in
+        self.setStyleSheet(dictToCSS(self.css_sheet))
+
     def set_frame_color(self,color_in):
         self.css_sheet['QLabel#bkgrnd_lbl_frame']['background'] = color_in
+        self.css_sheet['QPushButton#custom_btn1']['border-color'] = color_in
+        self.css_sheet['QPushButton#custom_btn1:!hover']['color'] = color_in
         self.setStyleSheet(dictToCSS(self.css_sheet))
 
     def set_titlebar_color(self,color_in):
