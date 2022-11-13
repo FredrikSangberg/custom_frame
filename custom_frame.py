@@ -236,7 +236,6 @@ class custom_frame_dialog(QDialog):
 
     def set_win_title_botton_side(self,where_ = 'right'):
         self.title_bar.set_titlebar_buttons(where_)
-
     # Mose events for moving window and hovering:
     def mouseMoveEvent(self, event):
         if event.buttons() == QtCore.Qt.LeftButton:
@@ -250,31 +249,47 @@ class custom_frame_dialog(QDialog):
                         w = (self.frame_orig_pos.x()+self.frame_orig_width) - event.globalPos().x()
                         h = self.frameGeometry().height()
                         self.setGeometry(event.globalPos().x(), self.frame_orig_pos.y(), w, h)
+                    else:
+                        self.setGeometry((self.frame_orig_pos.x()+self.frame_orig_width)-self.minimumWidth(), self.frame_orig_pos.y(), self.minimumWidth(),self.frameGeometry().height())
                 elif self.drag_setting == 'right_resize':
                     if (event.globalPos().x() - self.frame_orig_pos.x()) >= self.minimumWidth():
                         w = (event.globalPos().x() - self.frame_orig_pos.x())
                         h = self.frameGeometry().height()
                         self.setGeometry(self.frame_orig_pos.x(), self.frame_orig_pos.y(), w, h)
+                    else:
+                        self.setGeometry(self.frame_orig_pos.x(), self.frame_orig_pos.y(), self.minimumWidth(),self.frameGeometry().height())
                 elif self.drag_setting == 'bottom_resize':
                     if (event.globalPos().y()-self.frame_orig_pos.y()) >= self.minimumHeight():
                         w = self.frameGeometry().width()
                         h = (event.globalPos().y()-self.frame_orig_pos.y())
                         self.setGeometry(self.frame_orig_pos.x(), self.frame_orig_pos.y(), w, h)
+                    else:
+                        self.setGeometry(self.frame_orig_pos.x(), self.frame_orig_pos.y(), self.frameGeometry().width(), self.minimumHeight())
                 elif self.drag_setting == 'bottom_left_resize':
                     w = self.frame_orig_width
                     h = self.frame_orig_height
+                    pos_x = event.globalPos().x()
                     if ((self.frame_orig_pos.x()+self.frame_orig_width) - event.globalPos().x()) >= self.minimumWidth():
                         w = (self.frame_orig_pos.x() + self.frame_orig_width) - event.globalPos().x()
+                    else:
+                        w = self.minimumWidth()
+                        pos_x = (self.frame_orig_pos.x()+self.frame_orig_width)-self.minimumWidth()
                     if (event.globalPos().y() - self.frame_orig_pos.y()) >= self.minimumHeight():
                         h = (event.globalPos().y() - self.frame_orig_pos.y())
-                    self.setGeometry(event.globalPos().x(), self.frame_orig_pos.y(), w, h)
+                    else:
+                        h = self.minimumHeight()
+                    self.setGeometry(pos_x, self.frame_orig_pos.y(), w, h)
                 elif self.drag_setting == 'bottom_right_resize':
                     w = self.frame_orig_width
                     h = self.frame_orig_height
                     if (event.globalPos().x() - self.frame_orig_pos.x()) >= self.minimumWidth():
                         w = (event.globalPos().x() - self.frame_orig_pos.x())
+                    else:
+                        w = self.minimumWidth()
                     if (event.globalPos().y()-self.frame_orig_pos.y()) >= self.minimumHeight():
                         h = (event.globalPos().y()-self.frame_orig_pos.y())
+                    else:
+                        h = self.minimumHeight()
                     self.setGeometry(self.frame_orig_pos.x(), self.frame_orig_pos.y(), w, h)
 
         if event.buttons() == QtCore.Qt.NoButton:
@@ -294,6 +309,7 @@ class custom_frame_dialog(QDialog):
                 self.setCursor(Qt.SizeFDiagCursor)
             else:
                 self.setCursor(Qt.ArrowCursor)
+
 
     def mouseReleaseEvent(self, event):
         self.drag_setting = ''
