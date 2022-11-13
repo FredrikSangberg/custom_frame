@@ -1,10 +1,11 @@
-from PyQt5.QtWidgets import (QHBoxLayout,QStyle)
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import (QVBoxLayout,QHBoxLayout,QPushButton)
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import (
     QDialog,
     QLabel
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRect
+
 #from PySide import QtGui
 
 TITLEBAR_COLOR = 'rgba(117,125,90,1)'
@@ -22,7 +23,7 @@ CSS = \
                 'background':TITLEBAR_COLOR,
                 'font-size': '14px',
             },
-        'QLabel#bkgrnd_lbl':
+        'QLabel#bkgrnd_lbl_frame':
             {
                 'background':FRAME_COLOR,
             },
@@ -124,8 +125,21 @@ class custom_frame_dialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
 
         self.title_bar = top_frame_layout(parent=self, screen_height = screen_height)
-        self.background_label = QLabel('',self,objectName='bkgrnd_lbl')
+        self.background_label_frame = QLabel('',self,objectName='bkgrnd_lbl_frame')
         self.background_label2 = QLabel('',self,objectName='bkgrnd_lbl2')
+
+        #dummy_layput = QHBoxLayout()
+        #dummy_layput.setGeometry(QRect(0, 128, self.width(), self.height()))
+        #dummy_lbl = QPushButton('',self)
+        #dummy_lbl.setFixedSize(100,self.title_bar.title_bar_height-10)
+        #dummy_layput.addWidget(dummy_lbl)
+        #dummy_lbl.move(0, 0)
+        #dummy_layout2 = QVBoxLayout()
+        #dummy_layout2.addLayout(dummy_layput)
+        #tmp0 = QPushButton('hej')
+        #tmp0.setMinimumHeight(200)
+        #dummy_layout2.addWidget(tmp0)
+        #self.setLayout(dummy_layout2)
 
         # To be able to resize the window:
         self.frame_resize_label_left = QLabel('',self,objectName='frame_resize_label_left')
@@ -135,7 +149,7 @@ class custom_frame_dialog(QDialog):
         self.frame_resize_label_bottom_right = QLabel('', self, objectName='frame_resize_label_bottom_right')
 
         self.setMouseTracking(True)
-        self.background_label.setMouseTracking(True)
+        self.background_label_frame.setMouseTracking(True)
         self.background_label2.setMouseTracking(True)
         self.title_bar.win_title_lbl.setMouseTracking(True)
         self.title_bar.close_btn.setMouseTracking(True)
@@ -149,8 +163,8 @@ class custom_frame_dialog(QDialog):
 
     def resizeEvent(self, event):
         self.title_bar.set_width(self.frameGeometry().width())
-        self.background_label.setFixedSize(self.frameGeometry().width(),self.frameGeometry().height()-self.title_bar_height)
-        self.background_label.move(0,self.title_bar_height)
+        self.background_label_frame.setFixedSize(self.frameGeometry().width(),self.frameGeometry().height()-self.title_bar_height)
+        self.background_label_frame.move(0,self.title_bar_height)
         self.background_label2.setFixedSize(self.frameGeometry().width()-2*self.frame_wid,self.frameGeometry().height()-self.title_bar_height-self.frame_wid)
         self.background_label2.move(self.frame_wid,self.title_bar_height)
 
@@ -171,7 +185,7 @@ class custom_frame_dialog(QDialog):
         self.frame_resize_label_bottom_right.move(self.frameGeometry().width()-self.frame_wid, self.frameGeometry().height() - self.frame_wid)
 
     def set_frame_color(self,color_in):
-        self.css_sheet['QLabel#bkgrnd_lbl']['background'] = color_in
+        self.css_sheet['QLabel#bkgrnd_lbl_frame']['background'] = color_in
         self.setStyleSheet(dictToCSS(self.css_sheet))
 
     def set_titlebar_color(self,color_in):
@@ -191,8 +205,10 @@ class custom_frame_dialog(QDialog):
         self.mouse_edge_resize_sensitivity = nr_pixels
 
     def setWindowTitle(self,str_):
-        self.title_bar.win_title_lbl.setText(' ' + str_)
+        self.title_bar.win_title_lbl.setText(' ' + str_ + '   ')
 
+    def set_win_title_botton_side(self,where_ = 'right'):
+        self.title_bar.set_titlebar_buttons(where_)
 
     # Mose events for moving window and hovering:
     def mouseMoveEvent(self, event):
@@ -239,7 +255,7 @@ class custom_frame_dialog(QDialog):
             self.mousePosition = event.globalPos() - self.frameGeometry().topLeft()
             x = self.mousePosition.x()
             y = self.mousePosition.y()
-            if x < self.mouse_edge_resize_sensitivity and y < (self.frameGeometry().height()-self.mouse_edge_resize_sensitivity):
+            if x < self.mouse_edge_resize_sensitivity and y > self.title_bar_height and y < (self.frameGeometry().height()-self.mouse_edge_resize_sensitivity):
                 self.setCursor(Qt.SizeHorCursor)
             elif x > self.frameGeometry().width()-self.mouse_edge_resize_sensitivity and y > self.title_bar_height and y < (self.frameGeometry().height()-self.mouse_edge_resize_sensitivity):
                 self.setCursor(Qt.SizeHorCursor)
@@ -293,6 +309,7 @@ class top_frame_layout(QHBoxLayout):
     def __init__(self, parent=None,screen_height=1200):
         super(top_frame_layout,self).__init__()
         self.parent=parent
+        self.close_button_slignment = 'right'
 
         self.title_bar_height = int(0.025 * screen_height)
         self.buttons_width = int(4*self.title_bar_height/3)
@@ -318,9 +335,24 @@ class top_frame_layout(QHBoxLayout):
         self.minimize_btn.setFocusPolicy(QtCore.Qt.NoFocus)
         self.minimize_btn.setObjectName('minimize_win_btn')
 
+    def set_titlebar_buttons(self,where_):
+        if where_ == 'left':
+            self.close_button_slignment = where_
+        else:
+            self.close_button_slignment = 'right'
+        self.set_width(self.parent.frameGeometry().width())
+
 
     def set_width(self,new_wid):
-        self.close_btn.move(new_wid-self.buttons_width, 0)
-        self.minimize_btn.move(new_wid - 2*self.buttons_width, 0)
-        self.win_title_lbl.setFixedSize(new_wid-2*self.buttons_width, self.title_bar_height )
-
+        if self.close_button_slignment == 'right':
+            self.close_btn.move(new_wid-self.buttons_width, 0)
+            self.minimize_btn.move(new_wid - 2*self.buttons_width, 0)
+            self.win_title_lbl.setFixedSize(new_wid-2*self.buttons_width, self.title_bar_height )
+            self.win_title_lbl.move(0,0)
+            self.win_title_lbl.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        elif self.close_button_slignment == 'left':
+            self.close_btn.move(0, 0)
+            self.minimize_btn.move(self.buttons_width, 0)
+            self.win_title_lbl.setFixedSize(new_wid-2*self.buttons_width, self.title_bar_height )
+            self.win_title_lbl.move(2*self.buttons_width,0)
+            self.win_title_lbl.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)

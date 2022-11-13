@@ -61,34 +61,8 @@ class open_main_gui(QDialog):
         self.tmp.set_win_main_color('rgba(79,79,79,1)')
         self.tmp.set_frame_width(3)
         self.tmp.set_mouse_resize_sensibility(10)
+        self.tmp.set_win_title_botton_side('right')
         self.tmp.show()
-
-        month_rent = 1.0011594
-        amort_rent_each_month = 1.001655
-        total_loan = 3332000
-        total_rent = 0
-        for k in range(0,21):
-            total_rent += total_loan*(month_rent-1)
-            total_loan -= total_loan*(amort_rent_each_month-1)
-
-        print(total_loan)
-        print(total_rent)
-
-        new_rent_from_now = 1.00042
-        total_rent = 0
-        total_rent_new = 0
-        total_loan_new = total_loan-2000000
-        for k in range(21,36):
-            total_rent_new += total_loan_new*(new_rent_from_now-1)
-            total_rent += total_loan*(month_rent-1)
-            total_loan -= total_loan*(amort_rent_each_month-1)
-
-        amortering = 2000000
-        rent_each_month = 1.0024
-        vinst_for_bank = amortering*(rent_each_month**15) - amortering
-        vinst_for_bank = vinst_for_bank - total_rent
-
-
 
         # This folder is the root of all file storage
         self.ground_base_folder = r'F:\desktop\FileAnnotator\alla_filer'
@@ -154,12 +128,24 @@ class open_main_gui(QDialog):
         self.resize_senitivity_btn.setStyleSheet(css_)
         self.resize_senitivity_btn.clicked.connect(self.set_resize_sensitivity)
 
-        self.titlebar_lbl = QLineEdit('')
-        self.frame_col_lbl = QLineEdit('')
-        self.main_background_lbl = QLineEdit('')
-        self.framewidth_lbl = QLineEdit('')
-        self.resize_senitivity_lbl = QLineEdit('')
+        self.set_win_title_bat_button_side_btn = QPushButton('Titlebar buttons (right)')
+        self.set_win_title_bat_button_side_btn.setMinimumHeight(min_btb_h)
+        self.set_win_title_bat_button_side_btn.setMinimumWidth(min_btn_w)
+        self.set_win_title_bat_button_side_btn.setDisabled(False)
+        self.set_win_title_bat_button_side_btn.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.set_win_title_bat_button_side_btn.setStyleSheet(css_)
+        self.set_win_title_bat_button_side_btn.clicked.connect(self.shift_titlebar_button_side)
 
+        self.titlebar_lbl = QLineEdit('')
+        self.titlebar_lbl.returnPressed.connect(self.select_titlebar_color_enter)
+        self.frame_col_lbl = QLineEdit('')
+        self.frame_col_lbl.returnPressed.connect(self.select_frame_color_enter)
+        self.main_background_lbl = QLineEdit('')
+        self.main_background_lbl.returnPressed.connect(self.main_background_lbl_enter)
+        self.framewidth_lbl = QLineEdit('')
+        self.framewidth_lbl.returnPressed.connect(self.main_background_lbl_enter)
+        self.resize_senitivity_lbl = QLineEdit('')
+        self.resize_senitivity_lbl.returnPressed.connect(self.set_resize_sensitivity_enter)
 
 
         all_layouts = QVBoxLayout()
@@ -178,6 +164,9 @@ class open_main_gui(QDialog):
         layout5 = QHBoxLayout()
         layout5.addWidget(self.resize_senitivity_btn)
         layout5.addWidget(self.resize_senitivity_lbl)
+        layout6 = QHBoxLayout()
+        layout6.addWidget(self.set_win_title_bat_button_side_btn)
+
 
         all_buttons_layout = QVBoxLayout()
         all_buttons_layout.addLayout(layout1)
@@ -185,6 +174,7 @@ class open_main_gui(QDialog):
         all_buttons_layout.addLayout(layout3)
         all_buttons_layout.addLayout(layout4)
         all_buttons_layout.addLayout(layout5)
+        all_buttons_layout.addLayout(layout6)
 
         # Add everything to the main layout:
         main_layout = QVBoxLayout()
@@ -208,16 +198,34 @@ class open_main_gui(QDialog):
         color = QColorDialog.getColor().getRgb()
         self.tmp.set_titlebar_color('rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)')
         self.titlebar_lbl.setText("'" + 'rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)' + "'")
+    def select_titlebar_color_enter(self):
+        txt = self.titlebar_lbl.text()
+        if txt[0]=="'":
+            self.tmp.set_titlebar_color(txt[1:len(txt)-1])
+        else:
+            self.tmp.set_titlebar_color(txt)
 
     def select_frame_color(self):
         color = QColorDialog.getColor().getRgb()
         self.tmp.set_frame_color('rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)')
         self.frame_col_lbl.setText("'" + 'rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)' + "'")
+    def select_frame_color_enter(self):
+        txt = self.frame_col_lbl.text()
+        if txt[0]=="'":
+            self.tmp.set_frame_color(txt[1:len(txt)-1])
+        else:
+            self.tmp.set_frame_color(txt)
 
     def select_main_color(self):
         color = QColorDialog.getColor().getRgb()
         self.tmp.set_win_main_color('rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)')
         self.main_background_lbl.setText("'" + 'rgba('+str(color[0])+','+str(color[1])+','+str(color[2])+',1)' + "'")
+    def main_background_lbl_enter(self):
+        txt = self.main_background_lbl.text()
+        if txt[0]=="'":
+            self.tmp.set_win_main_color(txt[1:len(txt)-1])
+        else:
+            self.tmp.set_win_main_color(txt)
 
     def set_frame_width(self):
         nr_pixels, ok = QInputDialog.getText(self, 'set frame width', 'Type nr pixels width:')
@@ -229,6 +237,14 @@ class open_main_gui(QDialog):
 
             except:
                 print('dfgh')
+    def main_background_lbl_enter(self):
+        nr_pixels = self.framewidth_lbl.text()
+        try:
+            nr_pixels = int(nr_pixels)
+            self.tmp.set_frame_width(nr_pixels)
+        except:
+            print('dfgh')
+
     def set_resize_sensitivity(self):
         nr_pixels, ok = QInputDialog.getText(self, 'set frame width', 'Type nr pixels width:')
         if ok:
@@ -238,9 +254,22 @@ class open_main_gui(QDialog):
                 self.resize_senitivity_lbl.setText(str(nr_pixels))
             except:
                 print('dfgh')
+    def set_resize_sensitivity_enter(self):
+        nr_pixels = self.resize_senitivity_lbl.text()
+        try:
+            nr_pixels = int(nr_pixels)
+            self.tmp.set_mouse_resize_sensibility(nr_pixels)
+        except:
+            print('dfgh')
 
+    def shift_titlebar_button_side(self):
+        if 'right' in self.set_win_title_bat_button_side_btn.text():
+            self.set_win_title_bat_button_side_btn.setText('Titlebar buttons (left)')
+            self.tmp.set_win_title_botton_side('left')
 
-
+        else:
+            self.set_win_title_bat_button_side_btn.setText('Titlebar buttons (right)')
+            self.tmp.set_win_title_botton_side('right')
 if __name__ == '__main__':
     app = QApplication([])
     screen_resolution = app.desktop().screenGeometry()
