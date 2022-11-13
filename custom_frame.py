@@ -146,19 +146,6 @@ class custom_frame_dialog(QDialog):
         self.background_label_frame = QLabel('',self,objectName='bkgrnd_lbl_frame')
         self.background_label2 = QLabel('',self,objectName='bkgrnd_lbl2')
 
-        #dummy_layput = QHBoxLayout()
-        #dummy_layput.setGeometry(QRect(0, 128, self.width(), self.height()))
-        #dummy_lbl = QPushButton('',self)
-        #dummy_lbl.setFixedSize(100,self.title_bar.title_bar_height-10)
-        #dummy_layput.addWidget(dummy_lbl)
-        #dummy_lbl.move(0, 0)
-        #dummy_layout2 = QVBoxLayout()
-        #dummy_layout2.addLayout(dummy_layput)
-        #tmp0 = QPushButton('hej')
-        #tmp0.setMinimumHeight(200)
-        #dummy_layout2.addWidget(tmp0)
-        #self.setLayout(dummy_layout2)
-
         # To be able to resize the window:
         self.frame_resize_label_left = QLabel('',self,objectName='frame_resize_label_left')
         self.frame_resize_label_right = QLabel('', self, objectName='frame_resize_label_right')
